@@ -4,13 +4,16 @@
 
 #ifndef UNTITLED3__COMMANDS_H_
 #define UNTITLED3__COMMANDS_H_
+#include "clientserver.h"
 #include "command.h"
+#include <iostream>
 #include <string>
 #include <stdio.h>
 #include <thread>
-#include "clinetserver.h"
 #include <list>
 #include <unordered_map>
+#include <functional>
+#include <unistd.h>
 
 #define READ 0
 #define WRITE 1
@@ -18,6 +21,7 @@
 using namespace std;
 
 struct vars {
+  string name;
   double value;
   string sim;
   //read or write
@@ -25,24 +29,37 @@ struct vars {
 };
 
 class allVars {
+  //name to vars
   unordered_map<string, vars> valsMap;
+  //adderes to vars for reading
+  unordered_map<string, vars> adrMap;
  public:
   void addVal(string name, double val, int mode, string sim) {
     vars newVal;
+    newVal.name = name;
     newVal.sim = sim;
     newVal.value = val;
     newVal.mode = mode;
     valsMap[name] = newVal;
+    if (mode == READ)
+      adrMap[sim] = newVal;
   }
-  int isAVar(string name) {
+  bool isAVar(string name) {
     auto ptr = valsMap.find(name);
     if (ptr == valsMap.end())
       return false;
     else return true;
   }
-  void UpdateValue(string key, double val) {
+  int UpdateValue(string key, double val) {
     if (valsMap[key].mode == WRITE)
       valsMap[key].value = val;
+    return 2;
+  }
+  double GetValue(string key) {
+    return valsMap[key].value;
+  }
+  const unordered_map<string,vars> *readMap(){
+    return &adrMap;
   }
 };
 
@@ -55,7 +72,7 @@ class OpenServerCommand : public Command {
     thread serverThread(serverOpen, port);
     serverThread.detach();
 
-    return 1;
+    return 2;
   }
 };
 
@@ -66,9 +83,10 @@ class ConnectCommand : public Command {
   ConnectCommand() {
   }
   int execute(string *vars) {
-    thread clientThread(connectCom, atoi(vars->c_str()));
+    connectCom(4);
+    thread clientThread(connectCom, atoi((vars + 1)->c_str()));
     clientThread.join();
-    return 2;
+    return 3;
   }
 };
 
@@ -83,7 +101,7 @@ class DefineVarCommand : public Command {
     int mode;
     vars[1] == "->" ? mode = WRITE : mode = READ;
     allVar->addVal(*vars, value, READ, *(vars + 3));
-    return 4;
+    return 5;
   }
 };
 
@@ -94,8 +112,8 @@ class Print : public Command {
   int execute(string *vars) {
     string text = vars->substr(1);
     text.pop_back();
-    cout << text << endl;
-    return 1;
+    std::cout << text << std::endl;
+    return 2;
   }
 };
 
@@ -106,7 +124,8 @@ class Sleep : public Command {
   }
   int execute(string *vars) {
     //sleep command on thread
-    sleep(atoi(vars->c_str()));
+    //////////////////////////////////////////vars->c_str() /100
+    sleep(0);
     return 2;
   }
 };

@@ -46,7 +46,7 @@ string *lexer(string flyFile) {
       }
       commands->push_back(token);
     } else addCommand(commands, token);
-    if (token == "while") {
+    if (token == "while" || token == "if") {
       token = "";
       while (rawData.peek() != '\n') {
         string temp;
