@@ -4,130 +4,83 @@
 
 #ifndef UNTITLED3__COMMANDS_H_
 #define UNTITLED3__COMMANDS_H_
-#include "clientserver.h"
-#include "command.h"
-#include <iostream>
-#include <string>
-#include <stdio.h>
-#include <thread>
-#include <list>
-#include <unordered_map>
-#include <functional>
-#include <unistd.h>
 
+#include "command.h"
+#include <string>
+#include <unordered_map>
 #define READ 0
 #define WRITE 1
-
-using namespace std;
+#define NONE -1
 
 struct vars {
-  string name;
+  std::string name;
   double value;
-  string sim;
+  std::string sim;
   //read or write
   int mode;
 };
 
 class allVars {
   //name to vars
-  unordered_map<string, vars> valsMap;
+  std::unordered_map<std::string, vars> valsMap;
+  //adderes to vars for writing
+  std::unordered_map<std::string, vars *> adrMap;
   //adderes to vars for reading
-  unordered_map<string, vars> adrMap;
+  std::unordered_map<std::string, vars *> toReadMap;
  public:
-  void addVal(string name, double val, int mode, string sim) {
-    vars newVal;
-    newVal.name = name;
-    newVal.sim = sim;
-    newVal.value = val;
-    newVal.mode = mode;
-    valsMap[name] = newVal;
-    if (mode == READ)
-      adrMap[sim] = newVal;
-  }
-  bool isAVar(string name) {
-    auto ptr = valsMap.find(name);
-    if (ptr == valsMap.end())
-      return false;
-    else return true;
-  }
-  int UpdateValue(string key, double val) {
-    if (valsMap[key].mode == WRITE)
-      valsMap[key].value = val;
-    return 2;
-  }
-  double GetValue(string key) {
-    return valsMap[key].value;
-  }
-  const unordered_map<string,vars> *readMap(){
-    return &adrMap;
-  }
+  void addVal(std::string name, double val, int mode, std::string sim);
+  bool isAVar(std::string name);
+  int UpdateValue(std::string *commands);
+  double GetValue(std::string key);
+  const std::unordered_map<std::string, vars *> *writeMap();
+  std::unordered_map<std::string, vars *> *readMap();
+  const std::unordered_map<std::string, vars> *varMap();
 };
 
 class OpenServerCommand : public Command {
   int port;
+  std::unordered_map<std::string, vars *> *readMap;
  public:
-  OpenServerCommand() {}
-  int execute(string *vars) {
-    int port = atoi(vars[0].c_str());
-    thread serverThread(serverOpen, port);
-    serverThread.detach();
-
-    return 2;
+  OpenServerCommand(std::unordered_map<std::string, vars *> *map) {
+    this->readMap = map;
   }
+  int execute(std::string *vars);
 };
 
 class ConnectCommand : public Command {
-  string ip;
+  std::string ip;
+  const std::unordered_map<std::string, vars *> *updateSim;
   int port;
  public:
-  ConnectCommand() {
+  ConnectCommand(const std::unordered_map<std::string, vars *> *update) {
+    this->updateSim = update;
   }
-  int execute(string *vars) {
-    connectCom(4);
-    thread clientThread(connectCom, atoi((vars + 1)->c_str()));
-    clientThread.join();
-    return 3;
-  }
+  int execute(std::string *vars);
 };
 
 class DefineVarCommand : public Command {
   allVars *allVar;
  public:
-  DefineVarCommand(allVars *ptr) {
-    this->allVar = ptr;
-  }
-  int execute(string *vars) {
-    double value = atof((vars + 1)->c_str());
-    int mode;
-    vars[1] == "->" ? mode = WRITE : mode = READ;
-    allVar->addVal(*vars, value, READ, *(vars + 3));
-    return 5;
-  }
+  DefineVarCommand(allVars *ptr);
+  int execute(std::string *vars);
 };
 
 class Print : public Command {
+  allVars *valsMap;
  public:
-  Print() {
+  Print(allVars *all_vars) {
+    valsMap = all_vars;
   }
-  int execute(string *vars) {
-    string text = vars->substr(1);
-    text.pop_back();
-    std::cout << text << std::endl;
-    return 2;
-  }
+  int execute(std::string *vars);
 };
 
 class Sleep : public Command {
   int time;
  public:
-  Sleep() {
-  }
-  int execute(string *vars) {
-    //sleep command on thread
-    //////////////////////////////////////////vars->c_str() /100
-    sleep(0);
-    return 2;
-  }
+  Sleep() {}
+  int execute(std::string *vars);
 };
+
+void closeConnctions();
 
 #endif //UNTITLED3__COMMANDS_H_

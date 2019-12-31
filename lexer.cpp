@@ -2,11 +2,11 @@
 // Created by erelon on 19/12/2019.
 //
 
-#include "lexer.h"
-#include <stdio.h>
 #include <string.h>
 #include <fstream>
 #include <bits/stdc++.h>
+
+using namespace std;
 
 void addCommand(list<string> *vector, string basic_string);
 int numOfBrackets(string basic_string);
@@ -14,12 +14,14 @@ using namespace std;
 
 string *lexer(string flyFile) {
   fstream rawData;
-  string token;
   list<string> *commands = new list<string>;
 
   rawData.open(flyFile);
-  while (!rawData.eof()) {
+  while (rawData) {
+    string token;
     rawData >> token;
+    if (token == "")
+      continue;
     while (numOfBrackets(token) == 1) {
       string temp;
       rawData >> temp;
@@ -62,6 +64,7 @@ string *lexer(string flyFile) {
     }
   }
   rawData.close();
+  commands->push_back("\0");
   string *com = new string[commands->size()];
   auto iter = commands->begin();
   int i = 0;

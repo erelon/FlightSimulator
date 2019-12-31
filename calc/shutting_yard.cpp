@@ -174,7 +174,8 @@ Expression *shuttingYard(const string input) {
     }
     //in case this is not a number or part of it:
     if (isOperator(ch)) {
-      if ((i == 0) && (i + 1 < input.length()) && (input[i] == '-') && (input[i + 1] != '(')) {
+      //(i == 0) &&
+      if ((i + 1 < input.length()) && (input[i] == '-') && (input[i + 1] != '(')) {
         negVal = true;
         i++;
         continue;

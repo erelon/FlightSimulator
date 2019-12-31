@@ -8,6 +8,6 @@
 #include <string>
 #include <bits/stdc++.h>
 
-void parser(string *commands);
+void parser(std::string *commands);
 
 #endif //UNTITLED3__PARSER_H_

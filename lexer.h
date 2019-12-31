@@ -8,8 +8,7 @@
 #include <string.h>
 #include <fstream>
 #include <bits/stdc++.h>
-using namespace std;
 
-string *lexer(string flyFile);
+std::string *lexer(std::string flyFile);
 
 #endif //UNTITLED3__LEXER_H_

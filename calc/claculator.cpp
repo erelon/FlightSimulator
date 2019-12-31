@@ -38,7 +38,7 @@ double Div::calculate() {
   return left->calculate() / right->calculate();
 }
 double AND::calculate() {
-    return left->calculate() && right->calculate();
+  return left->calculate() && right->calculate();
 }
 double OR::calculate() {
   return left->calculate() || right->calculate();
@@ -188,6 +188,10 @@ void Interpreter::setVariables(string str) {
       }
       //clean the '='
       temp.erase(0, 1);
+      if (temp[0] == '-') {
+        varValueStr += temp[0];
+        temp.erase(0, 1);
+      }
       while (((temp[0] <= '9') && ((temp[0]) >= '0')) || (temp[0] == '.')) {
         varValueStr += temp[0];
         temp.erase(0, 1);
