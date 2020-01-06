@@ -2,9 +2,8 @@
 // Created by erelon on 19/12/2019.
 //
 
-#include <string.h>
 #include <fstream>
-#include <bits/stdc++.h>
+#include "utils.h"
 
 using namespace std;
 
@@ -28,8 +27,23 @@ string *lexer(string flyFile) {
       token.append(" ");
       token.append(temp);
     }
-    if (token.find("=") != string::npos) {
-      //read all equsion
+    int eqplace = token.find("=");
+    if (token.find("Print") != string::npos) {
+      commands->push_back("Print");
+      string temp = token;
+      temp = token.substr(token.find_first_of("(") + 1);
+      //take out the ")"
+      temp.pop_back();
+      commands->push_back(temp);
+    } else if (eqplace == 0 || eqplace == token.size() - 1) {
+      if (eqplace == token.size() - 1) {
+        //take out the "=" in the end:
+        token.pop_back();
+        //checking that the string had more than just a "="
+        if (token != "")
+          commands->push_back(token);
+      }
+      //read all equetion
       while (rawData.peek() != '\n') {
         string temp;
         rawData >> temp;
@@ -38,8 +52,10 @@ string *lexer(string flyFile) {
       }
       //take out the last " "
       token.pop_back();
-      //take out the =
-      token = token.substr(1);
+      if (token[0] == '=') {
+        //take out the =
+        token = token.substr(1);
+      }
       //if there is a { or a } we want it as a separated command
       if (token.find("{") != string::npos ||
           token.find("}") != string::npos) {
@@ -47,6 +63,10 @@ string *lexer(string flyFile) {
         token.pop_back();
       }
       commands->push_back(token);
+    } else if (token.find("=") != string::npos) {
+      auto str = split(token, '=');
+      commands->push_back(str[0]);
+      commands->push_back(str[1]);
     } else addCommand(commands, token);
     if (token == "while" || token == "if") {
       token = "";
@@ -73,6 +93,7 @@ string *lexer(string flyFile) {
     iter++;
     i++;
   }
+  delete commands;
   return com;
 }
 

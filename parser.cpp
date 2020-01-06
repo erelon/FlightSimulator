@@ -32,7 +32,7 @@ void parser(string *commands) {
       }
       //jumping over '}'
       i++;
-      //runing the loop
+      //run the loop
       Interpreter *cond = new Interpreter();
       condition = lexCond(cond, condition, all_vars);
       j = savePlace;
@@ -49,8 +49,30 @@ void parser(string *commands) {
         condition = lexCond(cond, condition, all_vars);
       }
       delete (cond);
+    } else if (commands[i].compare("if") == 0) {
+      string condition = commands[i + 1];
+      //commands[i+2] is '{'
+      i += 3;
+      int j = i;
+      while (commands[i] != "}")
+        i++;
+      //jumping over '}'
+      i++;
+      Interpreter *cond = new Interpreter();
+      condition = lexCond(cond, condition, all_vars);
+      if (cond->interpret(condition)->calculate()) {
+        while (commands[j] != "}") {
+          c = commandMap[commands[j]];
+          if (c != nullptr)
+            j += c->execute(commands + j + 1);
+          else if (all_vars.isAVar(commands[j]))
+            j += all_vars.UpdateValue(commands + j);
+        }
+      }
+      delete cond;
     }
   }
+
   closeConnctions();
   unloadCommandMap(&commandMap);
 }

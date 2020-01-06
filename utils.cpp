@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 #include <sstream>
-#include <iostream>
 #include "commands.h"
 #include "calc/claculator.h"
 
@@ -64,6 +63,8 @@ string lexCond(Interpreter *inter, string condition, allVars all_vars) {
         placeOfEndVar = min(endSub.find_first_of(" "), endSub.find_first_of(")"));
         rem++;
       }
+      if (placeOfEndVar == -1)
+        placeOfEndVar = endSub.size();
       placeOfEndVar += rem;
       startSub.append(condition.substr(i + 1, placeOfEndVar) + ")" + endSub.substr(placeOfEndVar - rem));
       condition = startSub;

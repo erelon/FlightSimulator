@@ -10,13 +10,13 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include <unistd.h>
 
 #define RUN 0
 #define PAUSE 1
 #define STOP -1
 
 static int threadRunMode = RUN;
+allVars *allOfVars;
 
 void allVars::addVal(std::string name, double val, int mode, std::string sim) {
   vars newVal;
@@ -65,6 +65,7 @@ int ConnectCommand::execute(std::string *vars) {
   return 3;
 }
 int OpenServerCommand::execute(std::string *vars) {
+  //needs to be condition
   int port = atoi(vars[0].c_str());
   std::thread serverThread(serverOpen, port, this->readMap, &threadRunMode);
   serverThread.detach();
@@ -74,6 +75,7 @@ int OpenServerCommand::execute(std::string *vars) {
 
 DefineVarCommand::DefineVarCommand(allVars *ptr) {
   this->allVar = ptr;
+  allOfVars = ptr;
 }
 
 int DefineVarCommand::execute(std::string *vars) {
@@ -95,15 +97,19 @@ int DefineVarCommand::execute(std::string *vars) {
 }
 
 int Print::execute(std::string *vars) {
+  //needs a condition
   if (vars->find("\"") != std::string::npos) {
     std::string text = vars->substr(1);
     text.pop_back();
     std::cout << text << std::endl;
-    return 2;
   } else if (this->valsMap->isAVar(vars->c_str())) {
     std::cout << valsMap->GetValue(vars->c_str()) << std::endl;
-    return 2;
+  } else {
+    Interpreter *sentence = new Interpreter();
+    std::string condition = lexCond(sentence, *vars, *allOfVars);
+    std::cout << sentence->interpret(condition)->calculate() << std::endl;
   }
+  return 2;
 }
 int Sleep::execute(std::string *vars) {
   //sleep command on thread
