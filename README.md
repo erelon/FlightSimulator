@@ -17,6 +17,8 @@ To use this software:
 6) Run the program with your commands in a text file as a parameter (Ex: `./a.out ../fly.txt`).
 7) Run FlightGear.
 
+Here is an example of a valid command text file that starts the engine, does a liftoff and gets to 1000 altitude: [fly]()
+
 Notice:
 The language that this software can compile, for now:
 - Print to console with the command: `Print(_text with "" or a varible_)`.
