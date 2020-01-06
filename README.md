@@ -26,6 +26,8 @@ The language that this software can compile, for now:
 - Define a variable in mode read(`<-`) or write(`->`) to the simulator with the command: `var name mode sim("_generic_path.xml path_")`.
 - Define a normal variable that holds a double in this syntax: `name_of_var = value` or a simple calculation with numbers or other variables.
 - Handle `if` and `while` commands in this syntax: 
-`while\if condition {
+```
+while\if condition {
 commands
-}`
+}
+```
