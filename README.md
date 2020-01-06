@@ -9,7 +9,7 @@ In the language you can, for now:
 - Get information from the plane and its current state.
 
 To use this software:
-1) Download [Flight Gear]https://www.flightgear.org/download/.
+1) Download [Flight Gear](https://www.flightgear.org/download/).
 2) Download\Clone the code.
 3) Put the `generic_small.xml` in the FlightGear protocol folder (Ex: /usr/share/games/flightgear).
 4) Add this configurations to FlightGear in "additional settings": `--telnet=socket,in,10,127.0.0.1,5402,tcp --httpd=8080 --generic=socket,out,10,127.0.0.1,5400,tcp,generic_small`. (change the ports 5402, 8080, 5400 as you wish). 
